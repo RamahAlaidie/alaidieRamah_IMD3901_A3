@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Player 1</title>
+        <script src= "https://aframe.io/releases/1.0.3/aframe.min.js"></script>        
+        <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
+        <script src= "https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/buttons-toggle.js"></script>
+     <!--   <script src= "js/buttons-toggle.js"></script>-->
+    </head>
+    <body>
+        <a-scene class="p1">    
+
+            <!-- aframe community component-->
+            <a-entity environment= "preset: forest;"> </a-entity>
+
+            <!--creating floor for physics system-->
+            <a-entity  static-body geometry="primitive:plane;" position="0 -0.01 0" rotation= "-90 0 0" scale = "75 75 75" ></a-entity>
+
+            <!--camera-->
+            <a-camera wasd-controls look-controls position= "5 1.2 0" rotation = "0 90 0" class= 'camera'>
+                <a-entity   
+                id = "char" static-body position = "0 -0.5 -3" geometry = "primitive:sphere; radius:1;" material = "color: blue;"
+                ></a-entity>
+
+                <!--a child of camera, raycaster will be used to find selected objects-->
+                <a-entity 
+                cursor="rayOrigin:mouse"
+                raycaster="far:20; interval: 100; objects:.clickable; ">
+                </a-entity>
+
+                <a-entity 
+                id = "RedButton" class="clickable" position = "-7 3.5 -5" geometry = "primitive:plane; width:1.5; height:0.6;" material = "color: red;" buttons-toggle = "">
+                <a-entity position = "-0.56 0.1 0.01" text="value: Switch Teams; color:white; font:exo2bold; width:1.3; anchor:left; baseline:top; wrapCount:12" buttons-toggle=""></a-entity>
+                </a-entity>
+            </a-camera>
+
+
+
+            <a-entity   
+                id = "stadium wall" 
+                static-body
+                position = "0 0 -13"
+                rotation = "0 0 0"
+                scale = "1 1 1"
+                geometry = "primitive:box; height: 15; width:40; depth:1;"
+                material = "color: #CAE1A0;"
+                ></a-entity>
+
+            <a-entity   
+                id = "stadium wall"
+                static-body 
+                position = "0 0 13"
+                rotation = "0 0 0"
+                scale = "1 1 1"
+                geometry = "primitive:box; height: 15; width:40; depth:1;"
+                material = "color: #CAE1A0;"
+             ></a-entity>
+
+            <a-entity   
+                id = "stadium wall"
+                static-body 
+                position = "20 0 0"
+                rotation = "0 90 0"
+                scale = "1 1 1"
+                geometry = "primitive:box; height: 15; width:26; depth:1;"
+                material = "color: #CAE1A0;"
+            ></a-entity>
+        
+            <a-entity   
+                id = "stadium wall"
+                static-body 
+                position = "-20 0 0"
+                rotation = "0 90 0"
+                scale = "1 1 1"
+                geometry = "primitive:box; height: 15; width:26; depth:1;"
+                material = "color: #CAE1A0;"
+            ></a-entity>
+
+            <!-- Curved surface -->
+            <a-entity
+            geometry ="primitive: cylinder; openEnded: true; thetaLength: 180"
+            position = "0 7 0"
+            rotation = "0 0 90"
+            scale = "1 40 12"
+            material ="side: double"
+            ></a-entity>
+
+            <a-entity  
+            id="goal1" 
+            position="-15 1.5 0"
+            rotation="0 -90 90"
+            scale= "1 1 1"
+            geometry="primitive:plane; width: 3; height: 6; "
+            material= "color: #bdbdbd;; side: double;"
+            check_coll="">
+            </a-entity>
+
+            <a-entity 
+            id="goal2" 
+            position="15 1.5 0"
+            rotation="0 -90 -90"
+            scale= "1 1 1"
+            geometry="primitive:plane; width: 3; height: 6; "
+            material= "color: #bdbdbd; side: double;"
+            check_coll="">
+            </a-entity>
+
+            <a-entity   
+            id = "otherPlayer"
+            static-body
+            position = "-5 1.2 0;" 
+            geometry = "primitive:sphere; radius:0.5;"
+            material = "color: red;"
+            ></a-entity>
+
+            <a-entity   
+            id = "ball"
+            dynamic-body
+            position = "0 2 0"
+            rotation = "0 0 0"
+            scale = "1 1 1"
+            geometry = "primitive:sphere; radius:1;"
+            material = "color: black;"
+            ></a-entity>
+        
+        </a-scene>    
+       
+        <script>
+            let socket = io();
+            socket.on('connect', function(){
+                console.log("I am connected - " + socket.id);
+            });
+
+            camera = document.querySelector("a-camera");              //finds camera
+            playerPos= camera.getAttribute('position')
+
+            setInterval(function() {
+                socket.emit("p1PosX", playerPos.x);
+                //console.log("p1pos: "+ playerPos.x);
+                socket.emit("p1PosY", playerPos.y);
+                socket.emit("p1PosZ", (playerPos.z));
+
+            }, 1000 / 60);
+
+            //translate X
+            socket.on('send2X', function (data){
+                //select 
+                p2 = document.querySelector("#otherPlayer");
+                posX = p2.getAttribute("position");
+                
+                posX.x = data;
+            });
+
+            //translate Y (not really needed for this)
+            socket.on('send2Y', function (data){
+                //select 
+                p2 = document.querySelector("#otherPlayer");
+                posY = p2.getAttribute("position");
+                
+                posY.y = data;
+               // console.log(posY.y);
+            }); 
+
+            //translate Z
+            socket.on('send2Z', function (data){
+                //select 
+                p2 = document.querySelector("#otherPlayer");
+                posZ = p2.getAttribute("position");
+                
+                posZ.z = data;
+            });
+
+            //change other player
+            socket.on('CRp2', function (data){
+                otherPlyr = document.querySelector("#otherPlayer");
+                otherPlyr.setAttribute('material', 'color', 'red');
+            });
+
+            //change other player
+            socket.on('CBp2', function (data){
+                otherPlyr = document.querySelector("#otherPlayer");
+                otherPlyr.setAttribute('material', 'color', 'blue');
+            });                
+            
+        </script>
+
+        <div id = "score"></div>
+
+    </body>
+</html>
