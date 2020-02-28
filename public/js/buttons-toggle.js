@@ -2,7 +2,8 @@ AFRAME.registerComponent('buttons-toggle', {
     init: function () 
     {
       //pre storing attributes
-      camera = document.querySelector("#char");              //finds camera
+      camera = document.getElementById("character");              //finds camera
+      charCol = camera.getAttribute("material");
       scene = document.querySelector("a-scene");
       sceneID = scene.getAttribute("class");
       //console.log(sceneID);
@@ -10,22 +11,22 @@ AFRAME.registerComponent('buttons-toggle', {
       //socket io
       let socket = io();
 
-      //playerCol= camera.getAttribute('material')
-
       Context_AF = this;
 
         Context_AF.el.addEventListener('click', function(event){
 
           buttonType = Context_AF.el.getAttribute("id");
           console.log(buttonType);
-            
+          
+          //upon clicking using the buttons id, sets the appropriate material and assigns the new ID
           if (buttonType == "RedButton"){
-            camera.setAttribute('material', 'color', 'red');
-            console.log(camera);
             Context_AF.el.setAttribute('material', 'color', 'blue');
             Context_AF.el.setAttribute('id', 'BlueButton');
-            /*
-          //assigning vals
+            camera.setAttribute('material', 'color: red');  //forsome reason doesnt even set new color, although the console log showed i selected the correct object and this worked previously
+            
+
+            
+          //emmits that the team has been switched (meant to be for bots)
             if(sceneID == "p1"){
               socket.emit("p1Red");
 
@@ -33,7 +34,7 @@ AFRAME.registerComponent('buttons-toggle', {
             if(sceneID == "p2"){
               socket.emit("p2Red");
             }
-            Context_AF.checkTeams();*/
+            Context_AF.checkTeams();
           }
 
           if (buttonType == "BlueButton"){
@@ -42,14 +43,14 @@ AFRAME.registerComponent('buttons-toggle', {
             Context_AF.el.setAttribute('material', 'color', 'red');
             Context_AF.el.setAttribute('id', 'RedButton');
 
-            /*//assigning vals
+            //assigning vals
             if(sceneID == "p1"){
               socket.emit("p1Blue");
             }
             if(sceneID == "p2"){
               socket.emit("p2Blue");
             }
-            Context_AF.checkTeams();*/
+            Context_AF.checkTeams();
           }
 
           

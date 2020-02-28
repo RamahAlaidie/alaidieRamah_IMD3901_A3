@@ -7,7 +7,7 @@
         <script src= "https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="js/buttons-toggle.js"></script>
-     <!--   <script src= "js/buttons-toggle.js"></script>-->
+        <script src= "js/check_coll.js"></script>
     </head>
     <body>
         <a-scene class="p1">    
@@ -21,7 +21,7 @@
             <!--camera-->
             <a-camera wasd-controls look-controls position= "5 1.2 0" rotation = "0 90 0" class= 'camera'>
                 <a-entity   
-                id = "char" static-body position = "0 -0.5 -3" geometry = "primitive:sphere; radius:1;" material = "color: blue;"
+                id = "character" static-body position = "0 0 -3" geometry = "primitive:sphere; radius:1;" material = "color: blue;"
                 ></a-entity>
 
                 <!--a child of camera, raycaster will be used to find selected objects-->
@@ -31,7 +31,7 @@
                 </a-entity>
 
                 <a-entity 
-                id = "RedButton" class="clickable" position = "-7 3.5 -5" geometry = "primitive:plane; width:1.5; height:0.6;" material = "color: red;" buttons-toggle = "">
+                id = "RedButton" class="clickable" position = "0 3.5 -5" geometry = "primitive:plane; width:1.5; height:0.6;" material = "color: red;" buttons-toggle = "">
                 <a-entity position = "-0.56 0.1 0.01" text="value: Switch Teams; color:white; font:exo2bold; width:1.3; anchor:left; baseline:top; wrapCount:12" buttons-toggle=""></a-entity>
                 </a-entity>
             </a-camera>
@@ -89,22 +89,34 @@
 
             <a-entity  
             id="goal1" 
+            static-body
             position="-15 1.5 0"
             rotation="0 -90 90"
             scale= "1 1 1"
             geometry="primitive:plane; width: 3; height: 6; "
-            material= "color: #bdbdbd;; side: double;"
+            material= "color: red; side: double;"
             check_coll="">
             </a-entity>
 
             <a-entity 
+                 position = "2 3.5 -12.45" geometry = "primitive:plane; width:2; height:3;" material = "color: blue;">
+                <a-entity id = "Score1" position = "-0.56 0.1 0.01" text="value: 0; color:white; font:exo2bold; width:10; anchor:left; baseline:top; wrapCount:12"></a-entity>
+            </a-entity>
+
+            <a-entity 
             id="goal2" 
+            static-body
             position="15 1.5 0"
             rotation="0 -90 -90"
             scale= "1 1 1"
             geometry="primitive:plane; width: 3; height: 6; "
-            material= "color: #bdbdbd; side: double;"
+            material= "color: blue; side: double;"
             check_coll="">
+            </a-entity>
+
+            <a-entity 
+            position = "-2 3.5 -12.45" geometry = "primitive:plane; width:2; height:3;" material = "color: red;" >
+            <a-entity id = "Score2" position = "-0.56 0.1 0.01" text="value: 0; color:white; font:exo2bold; width:10; anchor:left; baseline:top; wrapCount:12"></a-entity>
             </a-entity>
 
             <a-entity   
@@ -134,15 +146,15 @@
             });
 
             camera = document.querySelector("a-camera");              //finds camera
-            playerPos= camera.getAttribute('position')
+            playerPos= camera.getAttribute('position');
 
             setInterval(function() {
                 socket.emit("p1PosX", playerPos.x);
                 //console.log("p1pos: "+ playerPos.x);
                 socket.emit("p1PosY", playerPos.y);
-                socket.emit("p1PosZ", (playerPos.z));
+                socket.emit("p1PosZ", (playerPos.z-3));
 
-            }, 1000 / 60);
+            }, 1000 / 24);
 
             //translate X
             socket.on('send2X', function (data){
